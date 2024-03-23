@@ -1,10 +1,23 @@
 import * as vscode from 'vscode';
+import { openLazygit, openLazygitFileHistory, openLazygitLog } from './src/terminal';
+
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Congratulations, your extension "lazygit-powershell" is now active!');
-	let disposable = vscode.commands.registerCommand('lazygit-powershell.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello World from lazygit-powershell!');
-	});
-	context.subscriptions.push(disposable);
+  let disposable_lazygit = vscode.commands.registerCommand(
+    "lazygit-powershell.lazygit",
+    openLazygit
+  );
+  let disposable_lazygit_log = vscode.commands.registerCommand(
+    "lazygit-powershell.lazygit_log",
+    openLazygitLog
+  );
+  let disposable_lazygit_file_history = vscode.commands.registerCommand(
+    "lazygit-powershell.lazygit_file_history",
+    openLazygitFileHistory
+  );
+  context.subscriptions.push(disposable_lazygit);
+  context.subscriptions.push(disposable_lazygit_log);
+  context.subscriptions.push(disposable_lazygit_file_history);
 }
+
 export function deactivate() {}

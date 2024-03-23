@@ -14,8 +14,16 @@
   "contributes": {
     "commands": [
       {
-        "command": "lazygit-powershell.helloWorld",
-        "title": "Hello World"
+        "command": "lazygit-powershell.lazygit",
+        "title": "lazygit-powershell: lazygit"
+      },
+      {
+        "command": "lazygit-powershell.lazygit_log",
+        "title": "lazygit-powershell: lazygit log"
+      },
+      {
+        "command": "lazygit-powershell.lazygit_file_history",
+        "title": "lazygit-powershell: lazygit file history"
       }
     ]
   },
