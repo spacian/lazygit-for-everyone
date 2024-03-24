@@ -1,19 +1,19 @@
 import * as vscode from 'vscode';
-import { openLazygit, openLazygitFileHistory, openLazygitLog } from './src/terminal';
+import { openLazygit, openFileHistory, openLog } from './src/terminal';
 
 
 export function activate(context: vscode.ExtensionContext) {
   let disposable_lazygit = vscode.commands.registerCommand(
-    "lazygit-powershell.lazygit",
+    "lazygit.lazygit",
     openLazygit
   );
   let disposable_lazygit_log = vscode.commands.registerCommand(
-    "lazygit-powershell.lazygit_log",
-    openLazygitLog
+    "lazygit.log",
+    openLog
   );
   let disposable_lazygit_file_history = vscode.commands.registerCommand(
-    "lazygit-powershell.lazygit_file_history",
-    openLazygitFileHistory
+    "lazygit.file_history",
+    openFileHistory
   );
   context.subscriptions.push(disposable_lazygit);
   context.subscriptions.push(disposable_lazygit_log);

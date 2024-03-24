@@ -1,6 +1,6 @@
 {
-  "name": "lazygit-powershell",
-  "displayName": "lazygit-powershell",
+  "name": "lazygit",
+  "displayName": "lazygit for everyone",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -14,16 +14,16 @@
   "contributes": {
     "commands": [
       {
-        "command": "lazygit-powershell.lazygit",
-        "title": "lazygit-powershell: lazygit"
+        "command": "lazygit.lazygit",
+        "title": "lazygit: lazygit"
       },
       {
-        "command": "lazygit-powershell.lazygit_log",
-        "title": "lazygit-powershell: lazygit log"
+        "command": "lazygit.log",
+        "title": "lazygit: log"
       },
       {
-        "command": "lazygit-powershell.lazygit_file_history",
-        "title": "lazygit-powershell: lazygit file history"
+        "command": "lazygit.file_history",
+        "title": "lazygit: file history"
       }
     ]
   },

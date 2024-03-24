@@ -3,27 +3,51 @@ import { version } from "os";
 import { API as GitAPI, GitExtension, APIState } from '../typings/git';
 
 export async function openLazygit(): Promise<void> {
-    if (!(await focusActiveLazygitInstance())) {
-        await newLazygitInstance();
+    if (!(await focusActiveInstance())) {
+        await newLazygit();
     }
     return;
 }
 
-export async function openLazygitFileHistory(): Promise<void> {
-    if (!(await focusActiveLazygitInstance())) {
-        await newLazygitInstanceFileHistory();
+export async function openFileHistory(): Promise<void> {
+    if (!(await focusActiveInstance())) {
+        await newFileHistory();
     }
     return;
 }
 
-export async function openLazygitLog(): Promise<void> {
-    if (!(await focusActiveLazygitInstance())) {
-        await newLazygitInstanceLog();
+export async function openLog(): Promise<void> {
+    if (!(await focusActiveInstance())) {
+        await newLog();
     }
     return;
 }
 
-async function focusActiveLazygitInstance(): Promise<boolean> {
+class GitRepositoryQP implements vscode.QuickPickItem {
+    label: string;
+    description: string;
+
+    constructor(name: string, description: string) {
+        this.label = name;
+        this.description = description;
+    }
+};
+
+function getShell(): string {
+    if (version().includes("Windows")) {
+        return "powershell";
+    }
+    return "bash";
+}
+
+function buildCommand(command: string): string {
+    if (version().includes("Windows")) {
+        return command + " ; exit";
+    }
+    return command + " && exit";
+}
+
+async function focusActiveInstance(): Promise<boolean> {
     for (const openTerminal of vscode.window.terminals) {
       if (openTerminal.name === "lazygit") {
           openTerminal.show();
@@ -33,82 +57,53 @@ async function focusActiveLazygitInstance(): Promise<boolean> {
     return false;
 }
 
-async function newLazygitInstance(): Promise<void> {
-    await vscode.commands.executeCommand("workbench.action.closePanel");
-    const terminal = vscode.window.createTerminal("lazygit", "powershell");
-    console.log(version());
-    terminal.sendText("lazygit; exit");
+async function execute(shell: string, command: string): Promise<void> {
+    const terminal = vscode.window.createTerminal("lazygit", shell);
     terminal.show();
-    await vscode.commands.executeCommand("workbench.action.terminal.moveToEditor");
     await vscode.commands.executeCommand("workbench.action.terminal.focus");
-    // if (vscode.window.terminals.length > 0) {
-    //     await vscode.commands.executeCommand("workbench.action.togglePanel");
-    // }
+    await vscode.commands.executeCommand("workbench.action.terminal.moveToEditor");
+    await vscode.commands.executeCommand("workbench.action.closePanel");
+    terminal.sendText(command);
     return;
 }
 
-async function newLazygitInstanceFileHistory(): Promise<void> {
-    if (vscode.window.activeTextEditor == null) {
-        return;
-    }
-    const filepath = vscode.window.activeTextEditor.document.fileName
-    await vscode.commands.executeCommand("workbench.action.closePanel");
-    const terminal = vscode.window.createTerminal("lazygit", "powershell");
-    console.log(version())
-    terminal.sendText(`lazygit -f ${filepath}; exit`);
-    terminal.show();
-    await vscode.commands.executeCommand("workbench.action.terminal.moveToEditor");
-    await vscode.commands.executeCommand("workbench.action.terminal.focus");
-    // if (vscode.window.terminals.length > 0) {
-    //     await vscode.commands.executeCommand("workbench.action.togglePanel");
-    // }
+async function newLazygit(): Promise<void> {
+    await execute(getShell(), buildCommand("lazygit"));
     return;
 }
-class GitRepositoryQP implements vscode.QuickPickItem {
-    label: string;
-    description: string;
 
-    constructor(name: string, description: string = "") {
-        this.label = name;
-        this.description = description;
-    }
-}
-
-// in your code assuming you have a list of items that you map to this object
-
-async function newLazygitInstanceLog(): Promise<void> {
+async function newFileHistory(): Promise<void> {
     if (vscode.window.activeTextEditor == null) {
         return;
     }
-    // https://stackoverflow.com/questions/45171300/read-current-git-branch-natively-using-vscode-extension
-    // https://stackoverflow.com/questions/46511595/how-to-access-the-api-for-git-in-visual-studio-code
-    const path = "";
-    const gitExtension = vscode.extensions.getExtension<GitExtension>('vscode.git')!.exports;
-    const git = gitExtension.getAPI(1);
-    const rep = git.repositories.at(0);
+    const filepath = vscode.window.activeTextEditor.document.fileName;
+    const command = buildCommand(`lazygit -f ${filepath}`);
+    await execute(getShell(), command);
+    return;
+}
+
+async function newLog(): Promise<void> {
+    const gitExtension = vscode.extensions.getExtension<GitExtension>('vscode.git');
+    if (gitExtension === undefined) {
+        return;
+    }
+    const git = gitExtension.exports.getAPI(1);
     const options = git.repositories.map((item) => {
         return new GitRepositoryQP(
         item.rootUri.fsPath.split("\\").pop()!.split("/").pop()!,
         item.rootUri.fsPath,
         );
     });
-
-    const pick = await vscode.window.showQuickPick(options, {
-        title: "Choose repository for lazygit log",
-        canPickMany: false,
-    });
-    if (pick == undefined) {
+    if (options.length === 0) {
         return;
     }
-    await vscode.commands.executeCommand("workbench.action.closePanel");
-    const terminal = vscode.window.createTerminal("lazygit", "powershell");
-    terminal.sendText(`lazygit -f ${pick.description}; exit`);
-    await vscode.commands.executeCommand("workbench.action.terminal.moveToEditor");
-    await vscode.commands.executeCommand("workbench.action.terminal.focus");
-    console.log(version());
-    terminal.show();
-    // if (vscode.window.terminals.length > 0) {
-    //     await vscode.commands.executeCommand("workbench.action.togglePanel");
-    // }
+    const pick = await vscode.window.showQuickPick(options, {
+        title: "Choose repository for lazygit log",
+    });
+    if (pick === undefined) {
+        return;
+    }
+    const command = buildCommand(`lazygit -f ${pick.description}`);
+    await execute(getShell(), command);
     return;
 }
