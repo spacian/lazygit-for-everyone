@@ -1,6 +1,7 @@
 {
   "name": "lazygit",
   "displayName": "lazygit for everyone",
+  "repository": "https://github.com/spacian/lazygit-for-everyone",
   "description": "",
   "version": "0.0.1",
   "engines": {
