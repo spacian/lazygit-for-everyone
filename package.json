@@ -4,7 +4,7 @@
   "displayName": "lazygit for everyone",
   "repository": "https://github.com/spacian/lazygit-for-everyone",
   "description": "A lazygit wrapper for both windows and unix systems",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.87.0"
   },
@@ -26,6 +26,14 @@
       {
         "command": "lazygit.file_history",
         "title": "lazygit: file history"
+      },
+      {
+        "command": "lazygit.lazygit_repository_current_file",
+        "title": "lazygit: lazygit for repository of current file"
+      },
+      {
+        "command": "lazygit.log_repository_current_file",
+        "title": "lazygit: log for repository of current file"
       }
     ]
   },
