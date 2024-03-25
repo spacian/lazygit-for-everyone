@@ -105,6 +105,9 @@ async function getRepositoryPath(lazygit_specifier: string = ""): Promise<undefi
     if (options.length === 1) {
         return options[0].description;
     }
+    options.sort((a, b) => {
+        return a.description.split("\\").length - b.description.split("\\").length;
+    })
     const pick = await vscode.window.showQuickPick(options, {
         title: "Choose repository for lazygit " + lazygit_specifier,
     });
