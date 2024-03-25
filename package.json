@@ -3,7 +3,7 @@
   "publisher": "spacian",
   "displayName": "lazygit for everyone",
   "repository": "https://github.com/spacian/lazygit-for-everyone",
-  "description": "",
+  "description": "A lazygit wrapper for both windows and unix systems",
   "version": "0.0.2",
   "engines": {
     "vscode": "^1.87.0"
