@@ -67,7 +67,27 @@ async function execute(shell: string, command: string): Promise<void> {
     return;
 }
 
-async function getRepositoryPath(lazygit_specifier: string = ""): Promise<undefined|string> {
+async function getRepositoryPathForFile(filepath: string): Promise<undefined | string> {
+    const gitExtension = vscode.extensions.getExtension<GitExtension>('vscode.git');
+    if (gitExtension === undefined) {
+        return undefined;
+    }
+    const git = gitExtension.exports.getAPI(1);
+    const paths = git.repositories.map((item) => {return item.rootUri.fsPath;});
+    while (filepath.length > 0) {
+        let fp = filepath.split("\\");
+        fp.pop();
+        filepath = fp.join("\\");
+        for (const path of paths) {
+            if (filepath === path) {
+                return path;
+            }
+        }
+    }
+    return undefined;
+}
+
+async function getRepositoryPath(lazygit_specifier: string = ""): Promise<undefined | string> {
     const gitExtension = vscode.extensions.getExtension<GitExtension>('vscode.git');
     if (gitExtension === undefined) {
         return undefined;
@@ -108,11 +128,11 @@ async function newFileHistory(): Promise<void> {
     if (vscode.window.activeTextEditor == null) {
         return;
     }
-    const repository_path = await getRepositoryPath();
+    const filepath = vscode.window.activeTextEditor.document.fileName;
+    const repository_path = await getRepositoryPathForFile(filepath);
     if (repository_path === undefined) {
         return;
     }
-    const filepath = vscode.window.activeTextEditor.document.fileName;
     const command = buildCommand(`lazygit -p ${repository_path} -f ${filepath}`);
     await execute(getShell(), command);
     return;
@@ -123,7 +143,7 @@ async function newLog(): Promise<void> {
     if (repository_path === undefined) {
         return;
     }
-    const command = buildCommand(`lazygit -f ${repository_path}`);
+    const command = buildCommand(`lazygit -p ${repository_path} -f ${repository_path}`);
     await execute(getShell(), command);
     return;
 }
