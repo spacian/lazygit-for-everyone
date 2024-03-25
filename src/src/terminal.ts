@@ -67,25 +67,10 @@ async function execute(shell: string, command: string): Promise<void> {
     return;
 }
 
-async function newLazygit(): Promise<void> {
-    await execute(getShell(), buildCommand("lazygit"));
-    return;
-}
-
-async function newFileHistory(): Promise<void> {
-    if (vscode.window.activeTextEditor == null) {
-        return;
-    }
-    const filepath = vscode.window.activeTextEditor.document.fileName;
-    const command = buildCommand(`lazygit -f ${filepath}`);
-    await execute(getShell(), command);
-    return;
-}
-
-async function newLog(): Promise<void> {
+async function getRepositoryPath(lazygit_specifier: string = ""): Promise<undefined|string> {
     const gitExtension = vscode.extensions.getExtension<GitExtension>('vscode.git');
     if (gitExtension === undefined) {
-        return;
+        return undefined;
     }
     const git = gitExtension.exports.getAPI(1);
     const options = git.repositories.map((item) => {
@@ -95,15 +80,50 @@ async function newLog(): Promise<void> {
         );
     });
     if (options.length === 0) {
-        return;
+        return undefined;
+    }
+    if (options.length === 1) {
+        return options[0].description;
     }
     const pick = await vscode.window.showQuickPick(options, {
-        title: "Choose repository for lazygit log",
+        title: "Choose repository for lazygit " + lazygit_specifier,
     });
     if (pick === undefined) {
+        return undefined;
+    }
+    return pick.description;
+}
+
+async function newLazygit(): Promise<void> {
+    const repository_path = await getRepositoryPath();
+    if (repository_path === undefined) {
         return;
     }
-    const command = buildCommand(`lazygit -f ${pick.description}`);
+    const command = buildCommand(`lazygit -p ${repository_path}`);
+    await execute(getShell(), command);
+    return;
+}
+
+async function newFileHistory(): Promise<void> {
+    if (vscode.window.activeTextEditor == null) {
+        return;
+    }
+    const repository_path = await getRepositoryPath();
+    if (repository_path === undefined) {
+        return;
+    }
+    const filepath = vscode.window.activeTextEditor.document.fileName;
+    const command = buildCommand(`lazygit -p ${repository_path} -f ${filepath}`);
+    await execute(getShell(), command);
+    return;
+}
+
+async function newLog(): Promise<void> {
+    const repository_path = await getRepositoryPath("log");
+    if (repository_path === undefined) {
+        return;
+    }
+    const command = buildCommand(`lazygit -f ${repository_path}`);
     await execute(getShell(), command);
     return;
 }
