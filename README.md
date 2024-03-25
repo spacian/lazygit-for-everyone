@@ -21,6 +21,10 @@ instructions for `lazygit` at https://github.com/jesseduffield/lazygit.
 
 ## Release Notes
 
+### 0.0.2
+
+- Choose repository if multiple are available.
+
 ### 0.0.1
 
 - Initial release.
