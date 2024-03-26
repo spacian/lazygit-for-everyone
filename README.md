@@ -26,6 +26,15 @@ instructions for `lazygit` at https://github.com/jesseduffield/lazygit.
 
 ## Release Notes
 
+### 0.0.4
+
+- Use CMD instead of PowerShell on Windows to improve startup time.
+
+### 0.0.3
+
+- Add commands to filter repositories by current file.
+- Sort repositories by depth in the file system.
+
 ### 0.0.2
 
 - Choose repository if multiple are available.
