@@ -49,15 +49,12 @@ class GitRepositoryQP implements vscode.QuickPickItem {
 
 function getShell(): string {
     if (version().includes("Windows")) {
-        return "powershell";
+        return "cmd";
     }
     return "bash";
 }
 
 function buildCommand(command: string): string {
-    if (version().includes("Windows")) {
-        return command + " ; exit";
-    }
     return command + " && exit";
 }
 
