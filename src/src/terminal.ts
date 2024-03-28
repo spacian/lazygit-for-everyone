@@ -170,7 +170,10 @@ async function newLogCurrentFile(): Promise<void> {
         return;
     }
     const filepath = vscode.window.activeTextEditor.document.fileName;
-    const repository_path = await getRepositoryPathForFile(filepath);
+    let repository_path = await getRepositoryPathForFile(filepath);
+    if (repository_path === undefined) {
+        repository_path = await getRepositoryPathQuickPick("log");
+    }
     if (repository_path === undefined) {
         return;
     }
@@ -184,7 +187,10 @@ async function newLazygitCurrentFile(): Promise<void> {
         return;
     }
     const filepath = vscode.window.activeTextEditor.document.fileName;
-    const repository_path = await getRepositoryPathForFile(filepath);
+    let repository_path = await getRepositoryPathForFile(filepath);
+    if (repository_path === undefined) {
+        repository_path = await getRepositoryPathQuickPick();
+    }
     if (repository_path === undefined) {
         return;
     }
