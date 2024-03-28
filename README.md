@@ -1,7 +1,7 @@
 ## Features
 
 This extension is a wrapper for `lazygit` (https://github.com/jesseduffield/lazygit). It
-should work on both Windows and Unix systems, utilizing `powershell` or `bash`
+should work on both Windows and Unix systems, utilizing `cmd` and `bash`
 respectively.
 
 The extension provides five commands:
@@ -25,6 +25,12 @@ To use `lazygit`, you need `lazygit` installed and in your path. You can find in
 instructions for `lazygit` at https://github.com/jesseduffield/lazygit.
 
 ## Release Notes
+
+### 0.0.5
+
+- Use choice for workspace as backup for current file repository commands if the file is
+  not in a repository.
+- Add error messages for failed commands.
 
 ### 0.0.4
 
