@@ -70,11 +70,11 @@ async function focusActiveInstance(): Promise<boolean> {
 
 async function execute(shell: string, command: string): Promise<void> {
     const terminal = vscode.window.createTerminal("lazygit", shell);
+    terminal.sendText(command);
     terminal.show();
     await vscode.commands.executeCommand("workbench.action.terminal.focus");
     await vscode.commands.executeCommand("workbench.action.terminal.moveToEditor");
     await vscode.commands.executeCommand("workbench.action.closePanel");
-    terminal.sendText(command);
     return;
 }
 
@@ -111,6 +111,7 @@ async function getRepositoryPathQuickPick(lazygit_specifier: string = ""): Promi
         );
     });
     if (options.length === 0) {
+        vscode.window.showErrorMessage("lazygit: No active repository found.");
         return undefined;
     }
     if (options.length === 1) {
@@ -140,11 +141,13 @@ async function newLazygit(): Promise<void> {
 
 async function newFileHistory(): Promise<void> {
     if (vscode.window.activeTextEditor == null) {
+        vscode.window.showErrorMessage("lazygit: No active text editor.");
         return;
     }
     const filepath = vscode.window.activeTextEditor.document.fileName;
     const repository_path = await getRepositoryPathForFile(filepath);
     if (repository_path === undefined) {
+        vscode.window.showErrorMessage("lazygit: Current file is not in a repository.");
         return;
     }
     const command = buildCommand(`lazygit -p ${repository_path} -f ${filepath}`);
