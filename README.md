@@ -26,6 +26,9 @@ instructions for `lazygit` at https://github.com/jesseduffield/lazygit.
 
 ## Release Notes
 
+### 0.0.6
+- Fix command line crashes that started happening after some vscode update.
+
 ### 0.0.5
 
 - Use choice for workspace as backup for current file repository commands if the file is

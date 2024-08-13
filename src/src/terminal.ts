@@ -54,6 +54,19 @@ function getShell(): string {
     return "bash";
 }
 
+var git: GitAPI | null = null;
+function getGitAPI(): GitAPI | undefined {
+    if (git != null) {
+        return git;
+    }
+    const gitExtension = vscode.extensions.getExtension<GitExtension>('vscode.git');
+    if (gitExtension === undefined) {
+        return undefined;
+    }
+    git = gitExtension.exports.getAPI(1);
+    return git;
+}
+
 function buildCommand(command: string): string {
     return command + " && exit";
 }
@@ -70,20 +83,19 @@ async function focusActiveInstance(): Promise<boolean> {
 
 async function execute(shell: string, command: string): Promise<void> {
     const terminal = vscode.window.createTerminal("lazygit", shell);
-    terminal.sendText(command);
     terminal.show();
     await vscode.commands.executeCommand("workbench.action.terminal.focus");
     await vscode.commands.executeCommand("workbench.action.terminal.moveToEditor");
     await vscode.commands.executeCommand("workbench.action.closePanel");
+    terminal.sendText(command);
     return;
 }
 
 async function getRepositoryPathForFile(filepath: string): Promise<undefined | string> {
-    const gitExtension = vscode.extensions.getExtension<GitExtension>('vscode.git');
-    if (gitExtension === undefined) {
+    const git = getGitAPI()
+    if (git === undefined) {
         return undefined;
     }
-    const git = gitExtension.exports.getAPI(1);
     const paths = git.repositories.map((item) => {return item.rootUri.fsPath;});
     while (filepath.length > 0) {
         let fp = filepath.split("\\");
@@ -99,11 +111,10 @@ async function getRepositoryPathForFile(filepath: string): Promise<undefined | s
 }
 
 async function getRepositoryPathQuickPick(lazygit_specifier: string = ""): Promise<undefined | string> {
-    const gitExtension = vscode.extensions.getExtension<GitExtension>('vscode.git');
-    if (gitExtension === undefined) {
+    const git = getGitAPI()
+    if (git === undefined) {
         return undefined;
     }
-    const git = gitExtension.exports.getAPI(1);
     const options = git.repositories.map((item) => {
         return new GitRepositoryQP(
         item.rootUri.fsPath.split("\\").pop()!.split("/").pop()!,
